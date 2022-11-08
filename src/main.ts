@@ -1,10 +1,10 @@
-import core from '@actions/core';
-import github from '@actions/github';
-import exec from '@actions/exec';
-import io from '@actions/io';
-import cp from 'child_process';
-import fs from 'fs';
-import path from 'path';
+const core = require('@actions/core');
+const github = require('@actions/github');
+const exec = require('@actions/exec');
+const io = require('@actions/io');
+const cp = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 async function run() {
   try {
@@ -75,35 +75,32 @@ async function run() {
     // actions/upload-release-asset 
 
     // Get source rpm name , to provide file name, path as output
-    let myOutput = '';
-    await cp.exec('ls /github/home/rpmbuild/SRPMS/', (err, stdout, stderr) => {
-      if (err) {
-        //some err occurred
-        console.error(err)
-      } else {
-          // the *entire* stdout and stderr (buffered)
-          console.log(`stdout: ${stdout}`);
-          myOutput = myOutput+`${stdout}`.trim();
-          console.log(`stderr: ${stderr}`);
-        }
-      });
+    // let myOutput = '';
+    // await cp.exec('ls /github/home/rpmbuild/SRPMS/', (err, stdout, stderr) => {
+    //   if (err) {
+    //     //some err occurred
+    //     console.error(err)
+    //   } else {
+    //       // the *entire* stdout and stderr (buffered)
+    //       console.log(`stdout: ${stdout}`);
+    //       myOutput = myOutput+`${stdout}`.trim();
+    //       console.log(`stderr: ${stderr}`);
+    //     }
+    //   });
 
 
     // only contents of workspace can be changed by actions and used by subsequent actions 
     // So copy all generated rpms into workspace , and publish output path relative to workspace (/github/workspace)
-    await exec.exec(`mkdir -p rpmbuild/SRPMS`);
     await exec.exec(`mkdir -p rpmbuild/RPMS`);
 
-    await exec.exec(`cp /github/home/rpmbuild/SRPMS/${myOutput} rpmbuild/SRPMS`);
     await cp.exec(`cp -R /github/home/rpmbuild/RPMS/. rpmbuild/RPMS/`);
 
-    await exec.exec(`ls -la rpmbuild/SRPMS`);
     await exec.exec(`ls -la rpmbuild/RPMS`);
     
     // set outputs to path relative to workspace ex ./rpmbuild/
-    core.setOutput("source_rpm_dir_path", `rpmbuild/SRPMS/`);              // path to  SRPMS directory
-    core.setOutput("source_rpm_path", `rpmbuild/SRPMS/${myOutput}`);       // path to Source RPM file
-    core.setOutput("source_rpm_name", `${myOutput}`);                      // name of Source RPM file
+    // core.setOutput("source_rpm_dir_path", `rpmbuild/SRPMS/`);              // path to  SRPMS directory
+    // core.setOutput("source_rpm_path", `rpmbuild/SRPMS/${myOutput}`);       // path to Source RPM file
+    // core.setOutput("source_rpm_name", `${myOutput}`);                      // name of Source RPM file
     core.setOutput("rpm_dir_path", `rpmbuild/RPMS/`);                      // path to RPMS directory
     core.setOutput("rpm_content_type", "application/octet-stream");        // Content-type for Upload
 
