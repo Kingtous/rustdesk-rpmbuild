@@ -1,10 +1,10 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const exec = require('@actions/exec');
-const io = require('@actions/io');
-const cp = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import core from '@actions/core';
+import github from '@actions/github';
+import exec from '@actions/exec';
+import io from '@actions/io';
+import cp from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 async function run() {
   try {
@@ -58,7 +58,11 @@ async function run() {
     // Execute rpmbuild , -ba generates both RPMS and SPRMS
     try {
       await exec.exec(
-        `rpmbuild -ba ${specFile.destFullPath}`
+        `rpmbuild -bb ${specFile.destFullPath}`, undefined, {
+          env: {
+            "HBB": `/github/workspace/`
+          }
+        }
       );
     } catch (err) {
       core.setFailed(`action failed with error: ${err}`);
@@ -102,8 +106,6 @@ async function run() {
     core.setOutput("source_rpm_name", `${myOutput}`);                      // name of Source RPM file
     core.setOutput("rpm_dir_path", `rpmbuild/RPMS/`);                      // path to RPMS directory
     core.setOutput("rpm_content_type", "application/octet-stream");        // Content-type for Upload
-    
-
 
   } catch (error) {
     core.setFailed(error.message);
