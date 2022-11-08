@@ -1,5 +1,5 @@
 # Using CentOS 7 as base image to support rpmbuild (packages will be Dist el7)
-FROM centos:8
+FROM fedora:28
 
 # Copying all contents of rpmbuild repo inside container
 COPY . .
